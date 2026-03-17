@@ -19,7 +19,10 @@ async function run(): Promise<void> {
       | "ref"
       | "tag";
     const baseRef = core.getInput("base_ref") || undefined;
-    const maxDiffSize = parseInt(core.getInput("max_diff_size") || "4000", 10);
+    const maxDiffSize = Math.max(
+      1,
+      Math.min(100000, parseInt(core.getInput("max_diff_size") || "4000", 10) || 4000)
+    );
     const language = core.getInput("language") || "english";
     const customPrompt = core.getInput("custom_prompt") || undefined;
     const model =
@@ -32,6 +35,13 @@ async function run(): Promise<void> {
     if (!["openai", "anthropic", "mistral"].includes(providerName)) {
       throw new Error(
         `Invalid provider: ${providerName}. Must be one of: openai, anthropic, mistral`
+      );
+    }
+
+    // Validate diff_mode
+    if (!["commit", "ref", "tag"].includes(diffMode)) {
+      throw new Error(
+        `Invalid diff_mode: ${diffMode}. Must be one of: commit, ref, tag`
       );
     }
 

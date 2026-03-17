@@ -65,6 +65,47 @@ describe("main", () => {
     expect(mockSetFailed).not.toHaveBeenCalled();
   });
 
+  it("clamps max_diff_size to valid range", async () => {
+    setupInputs({
+      provider: "openai",
+      api_key: "sk-test",
+      diff_mode: "commit",
+      max_diff_size: "999999",
+      language: "english",
+    });
+
+    mockComputeDiff.mockResolvedValue("diff content");
+    mockCreateProvider.mockResolvedValue({
+      generateSummary: jest.fn<() => Promise<string>>().mockResolvedValue("summary"),
+    });
+
+    await import("../src/main.js");
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Should be clamped to 100000
+    expect(mockComputeDiff).toHaveBeenCalledWith("commit", undefined, 100000);
+  });
+
+  it("falls back to 4000 when max_diff_size is NaN", async () => {
+    setupInputs({
+      provider: "openai",
+      api_key: "sk-test",
+      diff_mode: "commit",
+      max_diff_size: "not-a-number",
+      language: "english",
+    });
+
+    mockComputeDiff.mockResolvedValue("diff content");
+    mockCreateProvider.mockResolvedValue({
+      generateSummary: jest.fn<() => Promise<string>>().mockResolvedValue("summary"),
+    });
+
+    await import("../src/main.js");
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(mockComputeDiff).toHaveBeenCalledWith("commit", undefined, 4000);
+  });
+
   it("calls setFailed on error", async () => {
     setupInputs({
       provider: "openai",
@@ -77,5 +118,34 @@ describe("main", () => {
     await new Promise((r) => setTimeout(r, 100));
 
     expect(mockSetFailed).toHaveBeenCalledWith("git failed");
+  });
+
+  it("rejects invalid provider", async () => {
+    setupInputs({
+      provider: "invalid-provider",
+      api_key: "sk-test",
+    });
+
+    await import("../src/main.js");
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(mockSetFailed).toHaveBeenCalledWith(
+      expect.stringContaining("Invalid provider")
+    );
+  });
+
+  it("rejects invalid diff_mode", async () => {
+    setupInputs({
+      provider: "openai",
+      api_key: "sk-test",
+      diff_mode: "invalid-mode",
+    });
+
+    await import("../src/main.js");
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(mockSetFailed).toHaveBeenCalledWith(
+      expect.stringContaining("Invalid diff_mode")
+    );
   });
 });

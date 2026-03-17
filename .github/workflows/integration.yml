@@ -28,6 +28,8 @@ jobs:
           api_key: ${{ inputs.provider == 'openai' && secrets.OPENAI_API_KEY || inputs.provider == 'anthropic' && secrets.ANTHROPIC_API_KEY || secrets.MISTRAL_API_KEY }}
 
       - name: Print summary
+        env:
+          SUMMARY: ${{ steps.summary.outputs.summary }}
         run: |
           echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.summary.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
