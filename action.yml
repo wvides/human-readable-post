@@ -1,0 +1,44 @@
+name: "Human Readable Post"
+description: "Generate human-readable release summaries from git diffs using LLMs (OpenAI, Anthropic, or Mistral)"
+author: "waltervides"
+
+branding:
+  icon: "message-circle"
+  color: "blue"
+
+inputs:
+  provider:
+    description: "LLM provider to use: openai, anthropic, or mistral"
+    required: true
+  api_key:
+    description: "API key for the chosen LLM provider"
+    required: true
+  model:
+    description: "Model to use (defaults to provider's recommended model)"
+    required: false
+  diff_mode:
+    description: "How to compute the diff: commit (HEAD~1), ref (custom base), or tag (previous tag)"
+    required: false
+    default: "commit"
+  base_ref:
+    description: "Base ref for diff comparison (required when diff_mode is 'ref')"
+    required: false
+  max_diff_size:
+    description: "Maximum number of characters from the diff to send to the LLM"
+    required: false
+    default: "4000"
+  language:
+    description: "Language for the summary output"
+    required: false
+    default: "english"
+  custom_prompt:
+    description: "Additional instructions to include in the LLM prompt"
+    required: false
+
+outputs:
+  summary:
+    description: "Human-readable summary of the changes (2-6 lines)"
+
+runs:
+  using: "node20"
+  main: "dist/index.js"

@@ -1,0 +1,33 @@
+name: Integration Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "LLM provider to test"
+        required: true
+        type: choice
+        options:
+          - openai
+          - anthropic
+          - mistral
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Run human-readable-post
+        id: summary
+        uses: ./
+        with:
+          provider: ${{ inputs.provider }}
+          api_key: ${{ inputs.provider == 'openai' && secrets.OPENAI_API_KEY || inputs.provider == 'anthropic' && secrets.ANTHROPIC_API_KEY || secrets.MISTRAL_API_KEY }}
+
+      - name: Print summary
+        run: |
+          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.summary.outputs.summary }}" >> $GITHUB_STEP_SUMMARY
