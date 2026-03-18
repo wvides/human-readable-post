@@ -1,6 +1,6 @@
 name: "Human Readable Post"
 description: "Generate human-readable release summaries from git diffs using LLMs (OpenAI, Anthropic, or Mistral)"
-author: "waltervides"
+author: "wvides"
 
 branding:
   icon: "message-circle"

@@ -15,7 +15,7 @@ Instead of "branch main was deployed", your team sees:
 
 - name: Generate release summary
   id: summary
-  uses: waltervides/human-readable-post@v1
+  uses: wvides/human-readable-post@v1
   with:
     provider: openai
     api_key: ${{ secrets.OPENAI_API_KEY }}
@@ -75,7 +75,7 @@ Diffs a custom base ref against HEAD. Use with `fetch-depth: 0`.
   with:
     fetch-depth: 0
 
-- uses: waltervides/human-readable-post@v1
+- uses: wvides/human-readable-post@v1
   with:
     provider: anthropic
     api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -92,7 +92,7 @@ Diffs between the two most recent tags. Use with `fetch-depth: 0`.
     fetch-depth: 0
     fetch-tags: true
 
-- uses: waltervides/human-readable-post@v1
+- uses: wvides/human-readable-post@v1
   with:
     provider: mistral
     api_key: ${{ secrets.MISTRAL_API_KEY }}
@@ -104,7 +104,7 @@ Diffs between the two most recent tags. Use with `fetch-depth: 0`.
 ### Language
 
 ```yaml
-- uses: waltervides/human-readable-post@v1
+- uses: wvides/human-readable-post@v1
   with:
     provider: openai
     api_key: ${{ secrets.OPENAI_API_KEY }}
@@ -114,7 +114,7 @@ Diffs between the two most recent tags. Use with `fetch-depth: 0`.
 ### Custom Prompt
 
 ```yaml
-- uses: waltervides/human-readable-post@v1
+- uses: wvides/human-readable-post@v1
   with:
     provider: openai
     api_key: ${{ secrets.OPENAI_API_KEY }}
