@@ -8,7 +8,7 @@ describe("buildPrompt", () => {
     const prompt = buildPrompt(diff, "english");
     expect(prompt).toContain("in english");
     expect(prompt).toContain(diff);
-    expect(prompt).toContain("bullet");
+    expect(prompt).toContain("10 words max");
     expect(prompt).not.toContain("Additional instructions");
   });
 
