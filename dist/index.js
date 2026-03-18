@@ -27325,8 +27325,9 @@ async function computeDiff(mode, baseRef, maxDiffSize) {
 
 function buildPrompt(diff, language, customPrompt) {
     let prompt = `Summarize this git diff in ${language}. Rules:
+- Describe the overall purpose and effect of the changes at a high level
 - Max 10 lines, one sentence per line
-- Say what changed, nothing else
+- Do NOT list individual file changes or line-by-line details
 - No filler, no opinions, no buzzwords
 - No quotes around the summary
 
