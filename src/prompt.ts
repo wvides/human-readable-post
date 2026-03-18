@@ -4,7 +4,7 @@ export function buildPrompt(
   customPrompt?: string
 ): string {
   let prompt = `Summarize this git diff in ${language}. Rules:
-- One line, 10 words max
+- Max 10 lines, one sentence per line
 - Say what changed, nothing else
 - No filler, no opinions, no buzzwords
 - No quotes around the summary
