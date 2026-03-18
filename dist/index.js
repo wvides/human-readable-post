@@ -27271,10 +27271,14 @@ async function runGit(args) {
     return output.trim();
 }
 async function getCommitDiff() {
-    return runGit(["diff", "HEAD~1", "HEAD"]);
+    return runGit(["diff", "--", "HEAD~1", "HEAD"]);
 }
+const SAFE_REF_PATTERN = /^[a-zA-Z0-9_.\-\/]+$/;
 async function getRefDiff(baseRef) {
-    return runGit(["diff", baseRef, "HEAD"]);
+    if (!SAFE_REF_PATTERN.test(baseRef)) {
+        throw new Error(`Invalid base_ref: "${baseRef}". Must contain only alphanumeric characters, dots, hyphens, underscores, or slashes.`);
+    }
+    return runGit(["diff", "--", baseRef, "HEAD"]);
 }
 async function getTagDiff() {
     const tagsOutput = await runGit([
@@ -27288,7 +27292,7 @@ async function getTagDiff() {
         throw new Error("Tag mode requires at least 2 tags. Found: " + tags.length);
     }
     const [currentTag, previousTag] = tags;
-    return runGit(["diff", previousTag, currentTag]);
+    return runGit(["diff", "--", previousTag, currentTag]);
 }
 function truncateDiff(diff, maxSize) {
     if (diff.length <= maxSize) {
@@ -27324,21 +27328,17 @@ async function computeDiff(mode, baseRef, maxDiffSize) {
 }
 
 function buildPrompt(diff, language, customPrompt) {
-    let prompt = `Summarize this git diff in ${language}. Rules:
+    let system = `Summarize git diffs in ${language}. Rules:
 - Describe the overall purpose and effect of the changes at a high level
 - Max 10 lines, one sentence per line
 - Do NOT list individual file changes or line-by-line details
 - No filler, no opinions, no buzzwords
-- No quotes around the summary
-
-Git diff:
-\`\`\`
-${diff}
-\`\`\``;
+- No quotes around the summary`;
     if (customPrompt) {
-        prompt += `\n\nAdditional instructions: ${customPrompt}`;
+        system += `\n\nAdditional instructions: ${customPrompt}`;
     }
-    return prompt;
+    const user = `Git diff:\n\`\`\`\n${diff}\n\`\`\``;
+    return { system, user };
 }
 
 const DEFAULT_MODELS = {
@@ -34022,7 +34022,10 @@ class OpenAIProvider {
     async generateSummary(prompt) {
         const response = await this.client.chat.completions.create({
             model: this.model,
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+                { role: "system", content: prompt.system },
+                { role: "user", content: prompt.user },
+            ],
             temperature: 0.3,
             max_tokens: 512,
         });
@@ -37539,7 +37542,8 @@ class AnthropicProvider {
             model: this.model,
             max_tokens: 512,
             temperature: 0.3,
-            messages: [{ role: "user", content: prompt }],
+            system: prompt.system,
+            messages: [{ role: "user", content: prompt.user }],
         });
         const block = response.content[0];
         if (!block || block.type !== "text") {
@@ -96717,7 +96721,10 @@ class MistralProvider {
     async generateSummary(prompt) {
         const response = await this.client.chat.complete({
             model: this.model,
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+                { role: "system", content: prompt.system },
+                { role: "user", content: prompt.user },
+            ],
             temperature: 0.3,
             maxTokens: 512,
         });

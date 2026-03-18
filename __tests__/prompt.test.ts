@@ -6,20 +6,26 @@ describe("buildPrompt", () => {
 
   it("builds a prompt with diff and language", () => {
     const prompt = buildPrompt(diff, "english");
-    expect(prompt).toContain("in english");
-    expect(prompt).toContain(diff);
-    expect(prompt).toContain("overall purpose and effect");
-    expect(prompt).not.toContain("Additional instructions");
+    expect(prompt.system).toContain("in english");
+    expect(prompt.user).toContain(diff);
+    expect(prompt.system).toContain("overall purpose and effect");
+    expect(prompt.system).not.toContain("Additional instructions");
   });
 
   it("includes custom prompt when provided", () => {
     const prompt = buildPrompt(diff, "spanish", "Focus on API changes");
-    expect(prompt).toContain("in spanish");
-    expect(prompt).toContain("Additional instructions: Focus on API changes");
+    expect(prompt.system).toContain("in spanish");
+    expect(prompt.system).toContain("Additional instructions: Focus on API changes");
   });
 
   it("handles empty custom prompt as undefined", () => {
     const prompt = buildPrompt(diff, "english", undefined);
-    expect(prompt).not.toContain("Additional instructions");
+    expect(prompt.system).not.toContain("Additional instructions");
+  });
+
+  it("separates instructions from diff content", () => {
+    const prompt = buildPrompt(diff, "english");
+    expect(prompt.system).not.toContain(diff);
+    expect(prompt.user).not.toContain("Rules:");
   });
 });
