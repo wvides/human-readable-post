@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "GitHub Action that generates human-readable release summaries from git diffs using LLMs",
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "tsc --noEmit && rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
