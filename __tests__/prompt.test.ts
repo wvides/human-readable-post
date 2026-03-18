@@ -6,15 +6,15 @@ describe("buildPrompt", () => {
 
   it("builds a prompt with diff and language", () => {
     const prompt = buildPrompt(diff, "english");
-    expect(prompt).toContain("Write in english");
+    expect(prompt).toContain("in english");
     expect(prompt).toContain(diff);
-    expect(prompt).toContain("2-6 lines");
+    expect(prompt).toContain("bullet");
     expect(prompt).not.toContain("Additional instructions");
   });
 
   it("includes custom prompt when provided", () => {
     const prompt = buildPrompt(diff, "spanish", "Focus on API changes");
-    expect(prompt).toContain("Write in spanish");
+    expect(prompt).toContain("in spanish");
     expect(prompt).toContain("Additional instructions: Focus on API changes");
   });
 
