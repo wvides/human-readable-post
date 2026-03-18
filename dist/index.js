@@ -27271,14 +27271,14 @@ async function runGit(args) {
     return output.trim();
 }
 async function getCommitDiff() {
-    return runGit(["diff", "--", "HEAD~1", "HEAD"]);
+    return runGit(["diff", "HEAD~1", "HEAD", "--"]);
 }
 const SAFE_REF_PATTERN = /^[a-zA-Z0-9_.\-\/]+$/;
 async function getRefDiff(baseRef) {
     if (!SAFE_REF_PATTERN.test(baseRef)) {
         throw new Error(`Invalid base_ref: "${baseRef}". Must contain only alphanumeric characters, dots, hyphens, underscores, or slashes.`);
     }
-    return runGit(["diff", "--", baseRef, "HEAD"]);
+    return runGit(["diff", baseRef, "HEAD", "--"]);
 }
 async function getTagDiff() {
     const tagsOutput = await runGit([
@@ -27292,7 +27292,7 @@ async function getTagDiff() {
         throw new Error("Tag mode requires at least 2 tags. Found: " + tags.length);
     }
     const [currentTag, previousTag] = tags;
-    return runGit(["diff", "--", previousTag, currentTag]);
+    return runGit(["diff", previousTag, currentTag, "--"]);
 }
 function truncateDiff(diff, maxSize) {
     if (diff.length <= maxSize) {
@@ -27322,7 +27322,9 @@ async function computeDiff(mode, baseRef, maxDiffSize) {
             throw new Error(`Unknown diff_mode: ${mode}`);
     }
     if (!diff) {
-        throw new Error("Git diff is empty — nothing to summarize");
+        throw new Error("Git diff is empty — nothing to summarize. " +
+            "If using diff_mode 'commit', ensure your checkout step has fetch-depth >= 2. " +
+            "For 'tag' or 'ref' mode, use fetch-depth: 0.");
     }
     return truncateDiff(diff, maxDiffSize);
 }
